@@ -1,0 +1,58 @@
+---
+title: Title
+author: Jeppe Fjeldgaard
+output: 
+  html_document:
+    code_folding: hide
+    theme: paper 
+    toc: true
+    toc_float: true
+    collapse: false
+    number_sections: true
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+
+Intro text here ...
+
+# Introduction
+
+# Data 
+
+```{r data, message=FALSE, warning=FALSE, paged.print=TRUE}
+
+# Read raw data
+rawdataurl <- "https://raw.githubusercontent.com/JeppeFjeldgaard/Segregation/master/Elevtal.csv"
+df <- readr::read_csv2(url(rawdataurl), skip = 7) 
+
+# Clean data
+df <- 
+df %>% 
+  dplyr::filter(!is.na(Kommunenummer)) %>% 
+  dplyr::select(-Herkomst) %>% 
+  dplyr::rename(Origin = `Vestlig - Ikke-Vestlig`, 
+                `Municipal` = Kommunenummer,
+                `School` = Institutionsnummer)
+
+# Make table
+df %>% 
+  dplyr::select(`School`, `Municipal`, Origin, "2008/2009":"2018/2019") %>% 
+  dplyr::group_by(`School`, `Municipal`, Origin) %>% 
+  dplyr::summarize_at(vars("2008/2009":"2018/2019"), sum, na.rm = TRUE) %>% 
+  kableExtra::kable() %>% 
+  kableExtra::kable_styling(bootstrap_options = c("striped", 
+                                                  "hover", 
+                                                  font_size = 11)) %>% 
+  kableExtra::scroll_box(width = "700px", height = "400px")
+```
+
+# Mapping
+
+
+
+
+
+
