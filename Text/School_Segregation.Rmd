@@ -1,31 +1,32 @@
 ---
 title: Title
 author: Jeppe Fjeldgaard
-output: 
-  html_document:
-    code_folding: hide
-    theme: paper 
-    toc: true
-    toc_float: true
-    collapse: false
-    number_sections: true
+output: pdf_document
+fontsize: 11pt
+geometry: "left=6cm, right=5cm, top=2.5cm, bottom=2.5cm"
+toc: true
+
 ---
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 ```
+# Abstract {-}
 
-
-Intro text here ...
+An abstract
 
 # Introduction
 
+Intro text here ...
+
+# Asking the right question
+
 # Data 
 
-```{r data, message=FALSE, warning=FALSE, paged.print=TRUE}
+```{r data, message=FALSE, warning=FALSE}
 
 # Read raw data
-rawdataurl <- "https://raw.githubusercontent.com/JeppeFjeldgaard/Segregation/master/Elevtal.csv"
+rawdataurl <- "https://github.com/JeppeFjeldgaard/Segregation/blob/master/Data/Elevtal.csv?raw=true"
 df <- readr::read_csv2(url(rawdataurl), skip = 7) 
 
 # Clean data
@@ -45,12 +46,30 @@ df %>%
   kableExtra::kable() %>% 
   kableExtra::kable_styling(bootstrap_options = c("striped", 
                                                   "hover", 
-                                                  font_size = 11)) %>% 
-  kableExtra::scroll_box(width = "700px", height = "400px")
+                                                  font_size = 11))
 ```
 
 # Mapping
 
+```{r spatial data, echo=TRUE, message=FALSE, warning=FALSE, results='hide'}
+
+# Download data
+download.file("https://github.com/JeppeFjeldgaard/Segregation/blob/master/Data/ADM.zip?raw=true", destfile = "ADM.zip" , mode='wb')
+unzip("ADM.zip", exdir = ".")
+file.remove("ADM.zip")
+
+# Read shapefile
+shape.sf <- sf::st_read("./ADM", "KOMMUNE") 
+
+# Dissolve polygons
+shape.sf <-
+  shape.sf %>% 
+  dplyr::mutate(area = sf::st_area(shape.sf),
+                Municipal = as.character(as.numeric(as.character(KOMKODE)))) %>% 
+  dplyr::group_by(Municipal) %>% 
+  dplyr::summarise(area = sum(area)) 
+
+```
 
 
 
